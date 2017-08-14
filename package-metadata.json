@@ -1,0 +1,10 @@
+{
+    "sublime_text": "*",
+    "description": "This is a Sublime Text package for NCL (NCAR Command Language).",
+    "platforms": [
+        "*"
+    ],
+    "version": "1.0.8.1",
+    "url": "https://github.com/zamlty/sublime-ncl",
+    "dependencies": []
+}

@@ -1,0 +1,10 @@
+[2017-08-14] Update:
+
+- Add Python updater.
+- Add keywords and named colors.
+- Update the syntax and completions to NCL 6.4.0 via Python.
+- Fix typo in function extract_globalatts_hdf5.
+
+Authors:
+
+    - zamlty
