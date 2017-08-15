@@ -1,7 +1,7 @@
 """
 NCL Functions and Resources Updater for Sublime Text 3
 @author: zamlty
-@version: 2017.08.14
+@version: 2017.08.15
 """
 
 from bs4 import BeautifulSoup
@@ -19,7 +19,7 @@ def distinct(L, key=None):
     return sorted(list(set(L)), key=key)
 
 def getTrigger(args):
-    file, func, url = args
+    func, url = args
     soup = bs(url)
     text = soup.pre.text.splitlines()
 
@@ -33,10 +33,10 @@ def getTrigger(args):
     params = [row.strip().split()[0] for row in text[start:end]]
     contents = ", ".join(["${{{}:{}}}".format(i+1, k) for i, k in enumerate(params)])
     trigger = '{{ "trigger": "{0}", "contents": "{0}({1})" }},\n'.format(func, contents)
-    file.write(trigger)
+    return trigger
 
 def getTrigger_debug(args):
-    file, func, url = args
+    func, url = args
     soup = bs(url)
     text = soup.pre.text.splitlines()
 
@@ -82,7 +82,7 @@ completionsFile("resources.txt", "w", resources)
 # color tables
 print("color tables")
 soup = bs("http://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml")
-ctables = [list(td.strings)[0] for td in soup.select("table[border=1] tr td")]
+ctables = [next(td.strings) for td in soup.select("table[border=1] tr td")]
 ctables = distinct(ctables)
 completionsFile("ctables.txt", "w", ctables)
 
@@ -102,13 +102,13 @@ completionsFile("colors.txt", "w", colors)
 
 # function completions
 print("function completions")
-pool = Pool(16)
-f = open("completions-function.txt", "w")
-f = open("completions-function.txt", "a")
-
 t1 = time.time()
-pool.map(getTrigger, [(f, func, url) for func, url in zip(functions, funcUrls)])
+pool = Pool(16)
+triggers = pool.map(getTrigger, ((func, url) for func, url in zip(functions, funcUrls)))
 pool.close()
 pool.join()
+with open("completions-function.txt", "w") as f:
+    for trigger in triggers:
+        f.write(trigger)
 t2 = time.time()
 print("{:.1f} s".format(t2 - t1))
